@@ -1,13 +1,18 @@
 package work.javiermantilla.rabbitmq.producer;
 
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+//import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+//import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import work.javiermantilla.rabbitmq.config.MessagingConfig;
 import work.javiermantilla.rabbitmq.dto.MessageDTO;
 
@@ -17,12 +22,37 @@ import work.javiermantilla.rabbitmq.dto.MessageDTO;
 public class ProducerMessage {
 	private final RabbitTemplate rabbitTemplate;	
 	
+	/*
+	@PostConstruct
+    public void startSendingMessages() {
+        Flux.interval(Duration.ofSeconds(10))
+            .flatMap(tick -> sendMessage())
+            .subscribe();
+    }	
+	*/
 	@Scheduled(fixedDelay = 10000L)
-	public void sendMessage() {
-		MessageDTO messaje= new MessageDTO(UUID.randomUUID().toString()
-				,"Hola desde: "+Thread.currentThread().getName() );
+	private Mono<Void> sendMessage() {
 		
-		log.info("Sending message... {}",messaje.getId() );
-        rabbitTemplate.convertAndSend(MessagingConfig.EXCHANGE, MessagingConfig.ROUTING_KEY, messaje);
+		return Mono.fromRunnable(()->{
+			MessageDTO message= new MessageDTO(UUID.randomUUID().toString()
+					,"Hola desde: "+LocalDateTime.now().toString() );
+			
+			log.info("Sending message... {}",message.getId() );
+			rabbitTemplate.convertAndSend(MessagingConfig.EXCHANGE, MessagingConfig.ROUTING_KEY, message);
+		}).then();		
+		
+	}
+	
+	@Scheduled(fixedDelay = 10000L)
+	private Mono<Void> sendMessage1() {
+		
+		return Mono.fromRunnable(()->{
+			MessageDTO message= new MessageDTO(UUID.randomUUID().toString()
+					,"Cola 1 Hola desde: "+LocalDateTime.now().toString() );
+			
+			log.info("Sending message cola 1... {}",message.getId() );
+			rabbitTemplate.convertAndSend(MessagingConfig.EXCHANGE_1, MessagingConfig.ROUTING_KEY_1, message);
+		}).then();		
+		
 	}
 }
