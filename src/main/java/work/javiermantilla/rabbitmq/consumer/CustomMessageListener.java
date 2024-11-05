@@ -12,20 +12,21 @@ import work.javiermantilla.rabbitmq.dto.MessageDTO;
 @Log4j2
 public class CustomMessageListener {
 	
-	@RabbitListener(queues = MessagingConfig.QUEUE)
+	@RabbitListener(queues = MessagingConfig.QUEUE,ackMode = "MANUAL")
     public Mono<Void> receiveMessage(final MessageDTO customMessage) {
 		
 		return Mono.fromRunnable(() -> {
-            log.info("Received message and deserialized to 'Message' queque0: {}", customMessage.toString());           
+            log.info("Received queque:{}  message and deserialized to 'Message': {}",MessagingConfig.QUEUE, 
+            		customMessage.getId());
         }).then();
     }
 	
 	
-	@RabbitListener(queues = MessagingConfig.QUEUE_1)
-    public Mono<Void> receiveMessageQueque1(final MessageDTO customMessage) {
-		
-		return Mono.fromRunnable(() -> {
-            log.info("Received message and deserialized to Message Queque1: {}", customMessage.toString());           
+	@RabbitListener(queues = MessagingConfig.QUEUE_ONE,ackMode = "MANUAL")
+    public Mono<Void> receiveMessageQueque1(final MessageDTO customMessage) {		
+		return Mono.fromRunnable(() -> {			
+            log.info("Received message queque: {} and deserialized to Message: {}",MessagingConfig.QUEUE_ONE
+            		, customMessage.toString());           
         }).then();
     }
 }

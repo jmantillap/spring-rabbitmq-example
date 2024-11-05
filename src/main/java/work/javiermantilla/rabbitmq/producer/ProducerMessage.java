@@ -37,22 +37,25 @@ public class ProducerMessage {
 			MessageDTO message= new MessageDTO(UUID.randomUUID().toString()
 					,"Hola desde: "+LocalDateTime.now().toString() );
 			
-			log.info("Sending message... {}",message.getId() );
+			log.info("Sending message id: ... {}",message.getId() );
 			rabbitTemplate.convertAndSend(MessagingConfig.EXCHANGE, MessagingConfig.ROUTING_KEY, message);
 		}).then();		
 		
 	}
 	
+	
 	@Scheduled(fixedDelay = 10000L)
-	private Mono<Void> sendMessage1() {
+	private Mono<Void> sendMessageOther() {
 		
 		return Mono.fromRunnable(()->{
 			MessageDTO message= new MessageDTO(UUID.randomUUID().toString()
-					,"Cola 1 Hola desde: "+LocalDateTime.now().toString() );
+					,"Cola other Hola desde: "+LocalDateTime.now().toString() );
 			
-			log.info("Sending message cola 1... {}",message.getId() );
-			rabbitTemplate.convertAndSend(MessagingConfig.EXCHANGE_1, MessagingConfig.ROUTING_KEY_1, message);
+			log.info("Sending message ... {}",message.getId() );
+			rabbitTemplate.convertAndSend(MessagingConfig.EXCHANGE_OTHER, MessagingConfig.ROUTING_KEY_OTHER, message);
 		}).then();		
 		
-	}
+	}	
+	
+	
 }

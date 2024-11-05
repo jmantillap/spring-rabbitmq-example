@@ -16,13 +16,15 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @Configuration
 @EnableWebFlux
 public class MessagingConfig {
-	public static final String QUEUE = "demo_queue";	
+	public static final String QUEUE = "demo_queue";
+	public static final String QUEUE_ONE = "demo_queue_one";
 	public static final String EXCHANGE = "demo_exchange";	
 	public static final String ROUTING_KEY = "demo_routingKey";
 	
-	public static final String QUEUE_1 = "demo_queue1";
-	public static final String EXCHANGE_1 = "demo_exchange1";	
-	public static final String ROUTING_KEY_1 = "demo_routingKey1";
+	
+	public static final String QUEUE_OTHER = "demo_queue_other";
+	public static final String EXCHANGE_OTHER = "demo_exchange_other";	
+	public static final String ROUTING_KEY_OTHER = "demo_routingKey_other";
 	
 
 	@Bean
@@ -36,25 +38,36 @@ public class MessagingConfig {
     }
     
     @Bean
-    Binding declareBindingSpecific() {
-        return BindingBuilder.bind(appQueueSpecific()).to(appExchange()).with(ROUTING_KEY);
-    }
-
-    @Bean
-	TopicExchange appExchange1() {
-        return new TopicExchange(EXCHANGE_1);
+    Queue appQueueSpecific1() {
+        return new Queue(QUEUE_ONE);
     }
     
     @Bean
-    Queue appQueueSpecific1() {
-        return new Queue(QUEUE_1);
+    Binding declareBindingSpecific1() {
+        return BindingBuilder.bind(appQueueSpecific()).to(appExchange()).with(ROUTING_KEY);
     }
-   
+    
+    @Bean
+    Binding declareBindingSpecific2() {
+        return BindingBuilder.bind(appQueueSpecific1()).to(appExchange()).with(ROUTING_KEY);
+    }
+    
+    
+    @Bean
+	TopicExchange appExchangeOther() {
+        return new TopicExchange(EXCHANGE_OTHER);
+    }
+    
+    @Bean
+    Queue appQueueSpecificOther() {
+        return new Queue(QUEUE_OTHER);
+    }
         
     @Bean
-    Binding declareBindingSpecific1() {
-        return BindingBuilder.bind(appQueueSpecific1()).to(appExchange1()).with(ROUTING_KEY_1);
+    Binding declareBindingSpecificOther() {
+        return BindingBuilder.bind(appQueueSpecificOther()).to(appExchangeOther()).with(ROUTING_KEY_OTHER);
     }
+    
     
     @Bean
     RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
